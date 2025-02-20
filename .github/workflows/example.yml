@@ -1,12 +1,47 @@
-on: push
+name: 打包maven项目
+
+on:
+  push:
+    tags:
+      - '*' # 打tag时触发
 
 jobs:
-  job1:
+  example-build-release:
+    name: 运行环境
     runs-on: ubuntu-latest
+
     steps:
-    - run: pwd
-    - run: ls -lah
-  job2:
-    runs-on: windows-latest
-    steps:
-    - run: node --version
+      - name: 读取仓库内容
+        uses: actions/checkout@v4
+
+      - name: 设置Java环境
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 使用Maven编译jar
+        run: mvn -B package --file pom.xml
+
+      - name: 创建Release并上传JAR
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: target/example-*.jar
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: "Release for tag ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+
+      - name: 登录DockerHub
+        uses: docker/login-action@v3
+        with:
+            username: ${{ secrets.DOCKER_USERNAME }} # 保存在 project/settings/SecretsAndVariables/Actions/RepositorySecrets
+            password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 构建并推送到DockerHub
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/example:${{ github.ref_name }}
