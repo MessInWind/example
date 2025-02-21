@@ -64,5 +64,6 @@ jobs:
       - name: 构建并推送到DockerHub
         uses: docker/build-push-action@v2
         with:
+          context: .  # 使用当前目录作为构建上下文
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/example:${{ env.DOCKER_TAG_NAME }}
