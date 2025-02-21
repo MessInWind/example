@@ -40,7 +40,7 @@ jobs:
           prerelease: false
 
       - name: 打印当前工作路径
-        run:
+        run: |
           echo "Current working directory: $(pwd)"
 
       - name: 登录DockerHub
