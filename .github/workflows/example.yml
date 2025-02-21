@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 读取仓库内容
+      - name: 拉取仓库内容
         uses: actions/checkout@v4
 
       - name: 设置Java环境
@@ -22,11 +22,6 @@ jobs:
 
       - name: 使用Maven编译jar
         run: mvn -B package --file pom.xml
-
-      - name: 打印当前JAR包路径和工作路径
-        run: |
-          echo "Current working directory: $(pwd)"
-          ls -lah target
 
       - name: 创建Release并上传JAR
         uses: ncipollo/release-action@v1
